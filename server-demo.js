@@ -3,7 +3,7 @@ const fs   = require('fs');
 const path = require('path');
 
 const ROOT = __dirname;
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Map /images/gallery-N.jpg → actual files in folder
 const IMG_MAP = {
