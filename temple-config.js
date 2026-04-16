@@ -39,7 +39,7 @@ const TEMPLE = {
   // 👨‍⚖️  TRỤ TRÌ
   // ══════════════════════════════════════════════
   abbot: {
-    name:  '',   // Cập nhật tên sư trụ trì
+    name:  'Thích Đàm Thu',
     title: 'Trụ trì – Chùa Phúc Sinh Tự',
     bio:   'Với tâm nguyện hoằng dương Phật pháp, phụng sự cộng đồng phật tử thôn Ngô Phần và du khách thập phương, sư trụ trì luôn giữ ngọn đèn chánh pháp không bao giờ tắt trên mảnh đất làng Ngò.'
   },

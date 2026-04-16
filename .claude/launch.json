@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Chùa Phúc Sinh Tự – Demo",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["server-demo.js"],
+      "port": 3001
+    }
+  ]
+}
