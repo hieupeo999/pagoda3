@@ -952,20 +952,35 @@ function goQ(n){
 }
 setInterval(()=>goQ((qi+1)%qSlides.length), 5500);
 
-// ══ Countdown đến Lễ Cầu An 27/2 âm lịch ══
-// Tự động tính ngày dương lịch gần nhất còn trong tương lai
-function getLunarTarget(){
-  // Các ngày dương lịch tương ứng 27/2 âm lịch từng năm
-  const dates = [
-    new Date('2026-03-26T06:00:00'), // 27/2 Bính Ngọ (đã qua)
-    new Date('2027-03-15T06:00:00'), // 27/2 Đinh Mùi
-    new Date('2028-04-03T06:00:00'), // 27/2 Mậu Thân
-  ];
-  const now = new Date();
-  return dates.find(d => d > now) || dates[dates.length - 1];
+// ══ Thuật toán âm lịch Ho Ngoc Duc (chính xác, múi giờ +7) ══
+const TZ=7;
+function _jd(d,m,y){let a=Math.floor((14-m)/12),yr=y+4800-a,mo=m+12*a-3;let j=d+Math.floor((153*mo+2)/5)+365*yr+Math.floor(yr/4)-Math.floor(yr/100)+Math.floor(yr/400)-32045;if(j<2299161)j=d+Math.floor((153*mo+2)/5)+365*yr+Math.floor(yr/4)-32083;return j;}
+function _nm(k){const T=k/1236.85,T2=T*T,T3=T2*T,dr=Math.PI/180;let J=2415020.75933+29.53058868*k+0.0001178*T2-0.000000155*T3+0.00033*Math.sin((166.56+132.87*T-0.009173*T2)*dr);const M=357.5291+35999.0503*T-0.0001559*T2-0.00000048*T3,Mp=306.0253+385.81691806*k+0.0107306*T2+0.00001236*T3,F=21.2964+390.67050646*k-0.0016528*T2-0.00000239*T3;let C=(0.1734-0.000393*T)*Math.sin(M*dr)+0.0021*Math.sin(2*dr*M)-0.4068*Math.sin(Mp*dr)+0.0161*Math.sin(dr*2*Mp)-0.0004*Math.sin(dr*3*Mp)+0.0104*Math.sin(dr*2*F)-0.0051*Math.sin(dr*(M+Mp))-0.0074*Math.sin(dr*(M-Mp))+0.0004*Math.sin(dr*(2*F+M))-0.0004*Math.sin(dr*(2*F-M))-0.0006*Math.sin(dr*(2*F+Mp))+0.0010*Math.sin(dr*(2*F-Mp))+0.0005*Math.sin(dr*(2*Mp+M));const dt=T<-11?0.001+0.000839*T+0.0002261*T2-0.00000845*T3-0.000000081*T*T3:-0.000278+0.000265*T+0.000262*T2;return Math.floor(J+C-dt+0.5+TZ/24);}
+function _sl(jdn){const T=(jdn-2451545.5-TZ/24)/36525,T2=T*T,dr=Math.PI/180,M=357.5291+35999.0503*T-0.0001559*T2-0.00000048*T*T2,L0=280.46645+36000.76983*T+0.0003032*T2;let DL=(1.9146-0.004817*T-0.000014*T2)*Math.sin(dr*M)+(0.019993-0.000101*T)*Math.sin(dr*2*M)+0.00029*Math.sin(dr*3*M);let L=(L0+DL)*dr;L-=Math.PI*2*Math.floor(L/(Math.PI*2));return Math.floor(L/Math.PI*6);}
+function _m11(y){const off=_jd(31,12,y)-2415021,k=Math.floor(off/29.530588853);let nm=_nm(k);if(_sl(nm)>=9)nm=_nm(k-1);return nm;}
+function _lo(a11){const k=Math.floor((a11-2415021.076998695)/29.530588853+0.5);let i=1,last=0,arc=_sl(_nm(k+i));do{last=arc;i++;arc=_sl(_nm(k+i));}while(arc!==last&&i<14);return i-1;}
+function _jdToDate(jd){let z=jd,a;a=z<2299161?z:Math.floor((z-1867216.25)/36524.25);if(z>=2299161)a=z+1+a-Math.floor(a/4);const b=a+1524,c=Math.floor((b-122.1)/365.25),d=Math.floor(365.25*c),e=Math.floor((b-d)/30.6001),dd=b-d-Math.floor(30.6001*e),mm=e<14?e-1:e-13,yy=mm>2?c-4716:c-4715;return new Date(yy,mm-1,dd,6,0,0);}
+function lunar2Solar(ld,lm,ly){
+  const a11=_m11(ly-1),b11=_m11(ly);
+  const k=Math.floor((a11-2415021.076998695)/29.530588853+0.5);
+  let off=lm-11; if(off<0)off+=12;
+  const leap=b11-a11>365,lo=leap?_lo(a11):-1;
+  const ms=leap&&off>=lo?_nm(k+off+1):_nm(k+off);
+  return _jdToDate(ms+ld-1);
 }
+function getNextLe(ld,lm){
+  const now=new Date();
+  for(let y=now.getFullYear()-1;y<=now.getFullYear()+4;y++){
+    for(let ly=y;ly<=y+1;ly++){
+      try{const d=lunar2Solar(ld,lm,ly);if(d>now)return d;}catch(e){}
+    }
+  }
+  return new Date(now.getTime()+365*864e5);
+}
+
+// ══ Countdown đến Lễ Cầu An 27/2 âm lịch (tính chính xác) ══
 function calcCountdown(){
-  const target = getLunarTarget();
+  const target = getNextLe(27,2);
   const now = new Date();
   const diff = target - now;
   if(diff <= 0){
