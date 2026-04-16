@@ -1,0 +1,12 @@
+{
+  "name": "chua-phuc-sinh-tu",
+  "version": "1.0.0",
+  "description": "Chùa Phúc Sinh Tự – Thôn Ngô Phần, Lương Tài, Bắc Ninh",
+  "main": "server-demo.js",
+  "scripts": {
+    "start": "node server-demo.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
